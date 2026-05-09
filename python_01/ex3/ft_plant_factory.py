@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
 class Plant:
+    def __init__(self, name: str, starting_height: float,
+                 starting_age: int) -> None:
+        print("Created: ", end="")
+        self.name = name
+        self.starting_height = starting_height
+        self.starting_age = starting_age
+        self.show()
+
     def grow(self) -> None:
         self.starting_height += 0.8
 
@@ -9,15 +17,7 @@ class Plant:
 
     def show(self) -> None:
         print(f"{self.name}: {round(self.starting_height, 1)}cm, "
-            f"{self.starting_age} days old")
-
-    def __init__(self, name: str, starting_height: float,
-                 starting_age: int) -> None:
-        print("Created: ", end="")
-        self.name = name
-        self.starting_height = starting_height
-        self.starting_age = starting_age
-        self.show()
+              f"{self.starting_age} days old")
 
 
 if __name__ == "__main__":
