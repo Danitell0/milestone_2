@@ -12,7 +12,7 @@ if __name__ == "__main__":
             except ValueError:
                 print(f"Invalid parameter: '{arg}'")
     if len(combo) == 0:
-        print("No damage provided. Usage: python3 " \
+        print("No damage provided. Usage: python3 "
               "ft_score_analytics.py <hit1> <hit2> ...")
     else:
         print(f"Damage hit: {combo}")
