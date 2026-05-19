@@ -19,7 +19,7 @@ def get_player_pos() -> tuple[float, float, float]:
                     print(f"Error on parameter '{i}': {e}")
             if len(coordinates) != 3:
                 continue
-            return tuple(coordinates)
+            return (coordinates[0], coordinates[1], coordinates[2])
 
 
 def main() -> None:
