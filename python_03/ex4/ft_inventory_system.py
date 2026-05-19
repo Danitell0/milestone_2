@@ -5,6 +5,7 @@ import sys
 
 def main() -> None:
     print("=== Inventory Analysis ===")
+
     if len(sys.argv) > 1:
         inventory: dict[str, int] = {}
         for arg in sys.argv[1:]:
@@ -20,6 +21,7 @@ def main() -> None:
                         inventory.update({parts[0]: quantity})
                 except ValueError as e:
                     print(f"Quantity error for '{parts[0]}': {e}")
+
         if inventory:
             print(f"Got inventory: {inventory}")
             inventory_list = list(inventory.keys())
