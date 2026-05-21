@@ -8,7 +8,7 @@ def main() -> None:
     if len(sys.argv) == 1:
         print(f"Usage: {sys.argv[0]} <file>\n")
     else:
-        print("=== Cyber Archives Recovery ===")
+        print("=== Cyber Archives Recovery & Preservation ===")
         try:
             print(f"Accessing file '{sys.argv[1]}'...")
 
@@ -28,7 +28,9 @@ def main() -> None:
             print(new_content_str)
             print("\n---")
 
-            new_file = str(input("Enter a new file name (or empty): "))
+            sys.stdout.write("Enter a new file name (or empty): ")
+            sys.stdout.flush()
+            new_file = sys.stdin.readline().strip()
             if new_file:
                 print(f"Saving data to '{new_file}'...")
                 try:
@@ -37,12 +39,14 @@ def main() -> None:
                     print(f"Data saved in file '{new_file}'.")
                     new_content.close()
                 except Exception as e:
-                    print(f"Error saving data in {new_file}: {e}")
+                    print(f"[STDERR] Error saving data in "
+                          f"{new_file}: {e}", file=sys.stderr)
             else:
                 print("Not saving data.")
 
         except Exception as e:
-            print(f"Error opening file '{sys.argv[1]}': {e}")
+            print(f"[STDERR] Error opening file "
+                  f"'{sys.argv[1]}': {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":
