@@ -18,7 +18,10 @@ if __name__ == "__main__":
         print(f"Damage hit: {combo}")
         print(f"Total hits: {len(combo)}")
         print(f"Total damage dealt: {sum(combo)}")
-        print(f"Average power: {(sum(combo) / len(combo)):.1f}")
+        try:
+            print(f"Average power: {(sum(combo) / len(combo)):.1f}")
+        except OverflowError:
+            print("Division too large for a float")
         print(f"Highest hit: {max(combo)}")
         print(f"Lowest hit: {min(combo)}")
         print(f"Combo range: {max(combo) - min(combo)}")

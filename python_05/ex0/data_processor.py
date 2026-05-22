@@ -11,23 +11,37 @@ class DataProcessor(ABC):
     def ingest(self, data: Any) -> None:
         pass
     def output(self) -> tuple[int, str]:
-        print(self.ingest)
+        
 
 class NumericProcessor(DataProcessor):
     def __init__(self) -> None:
         self.ingest_data = []
 
-    def ingest(self, data: Union[int, float]):
+    def ingest(self, data: int | float | list[int | float]) -> None:
         self.ingest_data.append(data)
 
-    def validate(self, data):
-        return super().validate(data)
+    def validate(self, data) -> bool:
+        
 
 class TextProcessor(DataProcessor):
+    def __init__(self):
+        self.ingest_data = []
+
+    def ingest(self, data: str | list[str]) -> None:
+        self.ingest_data.append(data)
+
+    def validate(self, data) -> bool:
+
 
 class LogProcessor(DataProcessor):
+    def __init__(self):
+        self.ingest_data = []
 
+    def ingest(self, data: dict) -> None:
+        self.ingest_data.append(data)
 
+    def validate(self, data) -> bool:
+        
 
 def main() -> None:
     print("=== Code Nexus - Data Processor ===\n")
