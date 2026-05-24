@@ -23,17 +23,28 @@ class DataProcessor(abc.ABC):
 
 
 class DataStream():
-    def __init__(self, stream: list[typing.Any]) -> None:
-        ...
+    def __init__(self) -> None:
+        self.processors: list[DataProcessor] = []
 
     def register_processor(self, proc: DataProcessor) -> None:
-        ...
+        self.processors.append(proc)
 
     def process_stream(self, stream: list[typing.Any]) -> None:
-        ...
+        for content in stream:
+            for processor in self.processors:
+                if processor.validate(content):
+                    processor.ingest(content)
+                    break
+            else:
+                print(f"DataStream error - Can't process element in stream: {content}")
 
     def print_processors_stats(self) -> None:
         print("== DataStream statistics ==")
+        if not self.processors:
+            print("No processor found, no data")
+        for processor in self.processors:
+            print(f"{processor}: total {processor.counter} items processed,"
+                  f" remaining {len(processor.ingest_data)} on processor")
 
 
 
@@ -106,6 +117,26 @@ class LogProcessor(DataProcessor):
 
 def main():
     print("=== Code Nexus - Data Stream ===\n")
+
+    random_list = ['Hello world', [3.14, -1, 2.71],
+                  [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},
+                  {'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]
+
+    print("Initialize Data Stream...")
+    ds = DataStream()
+    ds.print_processors_stats()
+
+    print("\nRegistering Numeric Processor\n")
+    ds.register_processor(NumericProcessor)
+
+    print("Send first batch of data stream: ['Hello world', [3.14, -1, 2.71],"
+          "[{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},"
+          "{'log_level': 'INFO', 'log_message': 'User wil isconnected'}], 42, ['Hi', 'five']]")
+    ds.process_stream(['Hello world', [3.14, -1, 2.71],
+                       [{'log_level': 'WARNING', 'log_message': 'Telnet access! Use ssh instead'},
+                       {'log_level': 'INFO', 'log_message': 'User wil is connected'}],
+                       42,
+                       ['Hi', 'five']])
 
 
 if __name__ == "__main__":
