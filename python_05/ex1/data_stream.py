@@ -6,7 +6,7 @@ import typing
 
 class DataProcessor(abc.ABC):
     def __init__(self) -> None:
-        self.ingest_data: list[typing.Any] = []
+        self.ingest_data: list[tuple[int, str]] = []
         self.counter = 0
         self.name = ""
 
@@ -51,7 +51,7 @@ class DataStream():
 
 
 class NumericProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.name = "Numeric Processor"
 
@@ -74,7 +74,7 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.name = "Text Processor"
 
@@ -97,11 +97,11 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.name = "Log Processor"
 
-    def ingest(self, data: dict[str, str] | list[dict]) -> None:
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise Exception("Improper log data")
         if isinstance(data, list):
@@ -129,7 +129,7 @@ class LogProcessor(DataProcessor):
             return False
 
 
-def main():
+def main() -> None:
     print("=== Code Nexus - Data Stream ===\n")
 
     logs = [

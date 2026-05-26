@@ -6,7 +6,7 @@ from typing import Any
 
 class DataProcessor(ABC):
     def __init__(self) -> None:
-        self.ingest_data: list[Any] = []
+        self.ingest_data: list[tuple[int, str]] = []
         self.counter = 0
 
     @abstractmethod
@@ -61,7 +61,7 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
-    def ingest(self, data: dict[str, str] | list[dict]) -> None:
+    def ingest(self, data: dict[str, str] | list[dict[str, str]]) -> None:
         if not self.validate(data):
             raise Exception("Improper log data")
         if isinstance(data, list):
@@ -101,7 +101,7 @@ def main() -> None:
         np.ingest('foo')
     except Exception as e:
         print(f"Got exception: {e}")
-    np_list = [1, 2, 3, 4, 5]
+    np_list: list[int | float] = [1, 2, 3, 4, 5]
     print(f"Processing data: {np_list}")
     np.ingest(np_list)
     print("Extracting 3 values...")

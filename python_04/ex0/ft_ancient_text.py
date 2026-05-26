@@ -4,14 +4,14 @@ import sys
 import typing
 
 
-def main():
+def main() -> None:
     if len(sys.argv) == 1:
         print(f"Usage: {sys.argv[0]} <file>\n")
     else:
         print("=== Cyber Archives Recovery ===")
         try:
             print(f"Accessing file '{sys.argv[1]}'...")
-            content: typing.IO = open(sys.argv[1])
+            content: typing.IO[str] = open(sys.argv[1])
             print("---\n")
             print(content.read())
             print("\n---")
