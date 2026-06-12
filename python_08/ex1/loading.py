@@ -15,6 +15,10 @@ try:
     import matplotlib
 except ImportError:
     matplotlib = None
+try:
+    import requests
+except ImportError:
+    requests = None
 
 
 def main() -> None:
@@ -33,14 +37,21 @@ def main() -> None:
         print(" [MISSING] numpy - For installation:\n"
               "  pip install numpy\n"
               "  poetry add numpy")
+    if requests:
+        print(f" [OK] requests {importlib.metadata.version('requests')} - Network access ready")
+    else:
+        print(" [MISSING] requests - For installation:\n"
+              "  pip install requests\n"
+              "  poetry add requests")
     if matplotlib:
         print(f" [OK] matplotlib {importlib.metadata.version('matplotlib')} - Visualization ready")
     else:
         print(" [MISSING] matplotlib - For installation:\n"
               "  pip install matplotlib\n"
               "  poetry add matplotlib")
+
         
-    if pandas and numpy and matplotlib:
+    if pandas and numpy and matplotlib and requests:
         print("Analyzing Matrix data...")
         print("Processing 1000 data points...")
         print("Generating visualization...")
