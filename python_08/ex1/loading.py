@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import importlib.metadata
 
 try:
@@ -34,6 +35,12 @@ def pack_checker(name: str, module: object | None, description: str) -> bool:
 
 def main() -> None:
     print("\nLOADING STATUS: Loading programs...\n")
+    if sys.prefix == sys.base_prefix:
+        print("Environment: Global")
+    elif "pypoetry" in sys.prefix:
+        print("Environment: Poetry")
+    else:
+        print("Environment: pip+venv")
 
     print("Checking dependecies:")
     ok_pandas = pack_checker("pandas", pandas, "Data manipulation ready")
@@ -56,7 +63,7 @@ def main() -> None:
 
         print("\nProcessing data points...")
 
-        rewards = numpy.random.randint(100, 1000, size=len(data))
+        rewards = numpy.random.randint(1000, 10000, size=len(data))
         for person, reward in zip(data, rewards):
             person["reward"] = int(reward)
         dataframe = pandas.DataFrame(data)
