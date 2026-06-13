@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import importlib.metadata
 
 try:
@@ -13,6 +12,7 @@ except ImportError:
     numpy = None
 try:
     import matplotlib
+    import matplotlib.pyplot as plt
 except ImportError:
     matplotlib = None
 try:
@@ -21,43 +21,64 @@ except ImportError:
     requests = None
 
 
+def pack_checker(name: str, module: object | None, description: str) -> bool:
+    if module:
+        print(f" [OK] {name} ({importlib.metadata.version(name)})"
+              f" - {description}")
+        return True
+    else:
+        print(f" [MISSING] {name} - For installation:\n"
+              f"  pip install {name}\n  poetry add {name}")
+        return False
+
+
 def main() -> None:
     print("\nLOADING STATUS: Loading programs...\n")
 
     print("Checking dependecies:")
-    if pandas:
-        print(f" [OK] pandas {importlib.metadata.version('pandas')} - Data manipulation ready")
-    else:
-        print(" [MISSING] pandas - For installation:\n"
-              "  pip install pandas\n"
-              "  poetry add pandas")
-    if numpy:
-        print(f" [OK] numpy {importlib.metadata.version('numpy')} - Numerical computation ready")
-    else:
-        print(" [MISSING] numpy - For installation:\n"
-              "  pip install numpy\n"
-              "  poetry add numpy")
-    if requests:
-        print(f" [OK] requests {importlib.metadata.version('requests')} - Network access ready")
-    else:
-        print(" [MISSING] requests - For installation:\n"
-              "  pip install requests\n"
-              "  poetry add requests")
-    if matplotlib:
-        print(f" [OK] matplotlib {importlib.metadata.version('matplotlib')} - Visualization ready")
-    else:
-        print(" [MISSING] matplotlib - For installation:\n"
-              "  pip install matplotlib\n"
-              "  poetry add matplotlib")
+    ok_pandas = pack_checker("pandas", pandas, "Data manipulation ready")
+    ok_numpy = pack_checker("numpy", numpy, "Numerical computation ready")
+    ok_requests = pack_checker("requests", requests, "Network access ready")
+    ok_mat = pack_checker("matplotlib", matplotlib, "Visualization ready")
 
-        
-    if pandas and numpy and matplotlib and requests:
-        print("Analyzing Matrix data...")
-        print("Processing 1000 data points...")
-        print("Generating visualization...")
+    if ok_pandas and ok_numpy and ok_mat and ok_requests:
+        print("\nAnalyzing Matrix data...")
 
-        print("Analysis complete!")
-        print("Results saved to: matrix_analysis.png")
+        try:
+            api = 'https://api.fbi.gov/wanted/v1/list?pageSize=18'
+            response = requests.get(api)
+            page = response.json()
+            wanted_list = page["items"]
+            data = [{
+                "title": person["title"]} for person in wanted_list]
+        except Exception as e:
+            print(f"API failed to connect! - {e}")
+
+        print("\nProcessing data points...")
+
+        rewards = numpy.random.randint(100, 1000, size=len(data))
+        for person, reward in zip(data, rewards):
+            person["reward"] = int(reward)
+        dataframe = pandas.DataFrame(data)
+
+        print("\nGenerating visualization...")
+
+        bar_height = 0.5
+
+        plt.barh(
+            dataframe['title'], dataframe['reward'],
+            color='blue', edgecolor='grey',
+            height=bar_height, label='Rewards')
+
+        plt.title('FBI Wanted List', fontweight='bold', fontsize=15)
+        plt.xlabel('Rewards', fontweight='bold', fontsize=15)
+        plt.ylabel('Criminals', fontweight='bold', fontsize=15)
+        plt.yticks(fontsize=6)
+        plt.tight_layout()
+        plt.savefig('matrix_analysis.png')
+
+        print("\nAnalysis complete!")
+        print("\nResults saved to: matrix_analysis.png")
 
 
 if __name__ == "__main__":
