@@ -52,14 +52,15 @@ def main() -> None:
         print("\nAnalyzing Matrix data...")
 
         try:
-            api = 'https://api.fbi.gov/wanted/v1/list?pageSize=18'
+            api = 'https://api.fbi.gov/wanted/v1/list?pageSize=15'
             response = requests.get(api)
             page = response.json()
             wanted_list = page["items"]
             data = [{
                 "title": person["title"]} for person in wanted_list]
-        except Exception as e:
-            print(f"API failed to connect! - {e}")
+        except Exception:
+            print("API failed to connect!")
+            return 0
 
         print("\nProcessing data points...")
 
