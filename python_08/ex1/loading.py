@@ -60,7 +60,7 @@ def main() -> None:
                 "title": person["title"]} for person in wanted_list]
         except Exception:
             print("API failed to connect!")
-            return 0
+            return
 
         print("\nProcessing data points...")
 

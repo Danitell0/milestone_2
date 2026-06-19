@@ -20,8 +20,13 @@ def config_parsing(config: str) -> dict[str, str]:
         raise ValueError(f"Error opening configuration file: {e}")
     return settings
 
+
 def validate_config(settings: dict) -> bool:
-    ...
+    for key in REQUIRED_KEYS:
+        if key not in settings:
+            raise ValueError(f"Missing required key {key}")
+            return False
+    return True
 
 
 def main() -> None:
