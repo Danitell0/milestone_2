@@ -2,9 +2,16 @@
 
 import random
 from typing import Optional
+from enum import Enum
 
 
 class MazeGenerator():
+    class Direction(Enum):
+        NORTH = 1
+        EAST = 2
+        SOUTH = 4
+        WEST = 8
+
     def __init__(self, width: int, height: int,
                  entry_point: tuple[int, int],
                  exit_point: tuple[int, int],
@@ -21,12 +28,6 @@ class MazeGenerator():
             [15 for _ in range(self._width)]
             for _ in range(self._height)]
 
-
-# ------------testing
-
-def main() -> None:
-    ...
-
-
-if __name__ == "__main__":
-    main()
+    def has_wall(self, row: int, col: int, direction: Direction) -> bool:
+        cell_value = self._maze[row][col]
+        return bool(cell_value & direction.value)
