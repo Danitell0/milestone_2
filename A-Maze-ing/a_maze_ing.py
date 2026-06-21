@@ -9,6 +9,7 @@ REQUIRED_KEYS = ['WIDTH', 'HEIGHT', 'ENTRY', 'EXIT',
 
 
 def config_parsing(config: str) -> dict[str, str]:
+    """Function to get settings from config.txt and return dict"""
     try:
         settings = {}
         with open(config, 'r') as config_file:
@@ -24,6 +25,7 @@ def config_parsing(config: str) -> dict[str, str]:
 
 
 def validate_config(settings: dict[str, str]) -> None:
+    """Match settings with required keys and check their values"""
     for key in REQUIRED_KEYS:
         if key not in settings:
             raise ValueError(f"Missing required key {key}")
