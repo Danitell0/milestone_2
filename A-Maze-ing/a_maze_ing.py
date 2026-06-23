@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
+from MazeGen.maze_generator import MazeGenerator
+
 
 REQUIRED_KEYS = ['WIDTH', 'HEIGHT', 'ENTRY', 'EXIT',
                  'OUTPUT_FILE', 'PERFECT']
@@ -89,6 +91,8 @@ def main() -> None:
     except ValueError as e:
         print(e, file=sys.stderr)
         exit(1)
+    grid = MazeGenerator(10, 10, (2, 8), (7, 3))
+    grid.print_maze()
 
 
 if __name__ == "__main__":

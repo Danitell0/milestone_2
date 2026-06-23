@@ -31,3 +31,7 @@ class MazeGenerator():
     def has_wall(self, row: int, col: int, direction: Direction) -> bool:
         cell_value = self._maze[row][col]
         return bool(cell_value & direction.value)
+
+    def print_maze(self) -> None:
+        for row in self._maze:
+            print(row)
