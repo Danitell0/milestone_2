@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-import os
 import curses
 from curses import panel
 from configurations.config_checker import config_parsing, validate_config
@@ -57,10 +56,6 @@ class Menu(object):
         self.panel.hide()
         panel.update_panels()
         curses.doupdate()
-    
-    def draw_menu(self) -> None:
-        max_y, max_x = curses.getsyx()
-        self.window.addstr(max_y, max_x, "A-Maze_ing", curses.A_BOLD)
 
 
 class MazeWindow(object):
@@ -78,22 +73,5 @@ class MazeWindow(object):
         main_menu.display()
 
 
-def main(stdscr) -> None:
-    if len(sys.argv) != 2:
-        print(f"Missing configuration file: {sys.argv[0]} <file>")
-        exit(1)
-    try:
-        settings = config_parsing(sys.argv[1])
-        validate_config(settings)
-    except ValueError as e:
-        print(e, file=sys.stderr)
-    
-
-
-if __name__ == "__main__":
-    try:
-        curses.wrapper(MazeWindow)
-    except Exception as e:
-        print(f"Exiting program: {e}")
-
-curses.wrapper(main)
+def draw_menu() -> None:
+    max_y, max_x = stdscr.getmaxyx()
