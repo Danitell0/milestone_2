@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import sys
 import curses
 from curses import panel
-from configurations.config_checker import config_parsing, validate_config
 
 class Menu(object):
-    def __init__(self, items, stdscreen):
+    def __init__(self, title, items, stdscreen):
+        self.title = title
         self.window = stdscreen.subwin(0, 0)
         self.window.keypad(1)
         self.panel = panel.new_panel(self.window)
@@ -25,12 +24,14 @@ class Menu(object):
             self.position = len(self.items) - 1
     
     def display(self) -> None:
+        max_y, max_x = self.window.getmaxyx()
         self.panel.top()
         self.panel.show()
         self.window.clear()
 
         while True:
             self.window.refresh()
+            self.draw_menu()
             curses.doupdate()
             for index, item in enumerate(self.items):
                 if index == self.position:
@@ -39,7 +40,7 @@ class Menu(object):
                     mode = curses.A_NORMAL
             
                 msg = "%d. %s" % (index, item[0])
-                self.window.addstr(1 + index, 1, msg, mode)
+                self.window.addstr(3 + index, (max_x - len(msg)) // 2, msg, mode)
 
             key = self.window.getch()
 
@@ -57,6 +58,16 @@ class Menu(object):
         panel.update_panels()
         curses.doupdate()
 
+    def draw_menu(self) -> None:
+        max_y, max_x = self.window.getmaxyx()
+        self.window.addstr(1, (max_x - len(self.title)) // 2, self.title, curses.A_BOLD)
+
+        longest = max(len(self.title), max(len(item[0]) for item in self.items))
+        box_width = longest + 10
+        left_x = (max_x - box_width) // 2
+        right_x = left_x + box_width
+        self.window.addstr(0, left_x, "╔" + "═" * (box_width - 2) + "╗")
+        self.window.addstr(3 + len(self.items), left_x, "╚" + "═" * (box_width - 2) + "╝")
 
 class MazeWindow(object):
     def __init__(self, stdscreen):
@@ -66,12 +77,10 @@ class MazeWindow(object):
         submenu_items = [("ASCII Maze", curses.beep), 
                          ("Rendered Maze", curses.flash),
                          ("Special Maze", curses.flash)]
-        submenu = Menu(submenu_items, self.screen)
+        submenu = Menu("A-Maze-ing", submenu_items, self.screen)
 
         main_menu_items = [("Generate Maze", submenu.display)]
-        main_menu = Menu(main_menu_items, self.screen)
+        main_menu = Menu("A-Maze-ing", main_menu_items, self.screen)
         main_menu.display()
 
-
-def draw_menu() -> None:
-    max_y, max_x = stdscr.getmaxyx()
+curses.wrapper(MazeWindow)
