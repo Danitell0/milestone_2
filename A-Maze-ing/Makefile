@@ -22,7 +22,7 @@ debug:
 clean:
 	@echo "Finding and removing extra files..."
 	@find . -name "__pycache__" -exec rm -rf {} \;
-	@find . -name "mypy_cache" -exec rm -rf {} \;
+	@find . -name ".mypy_cache" -exec rm -rf {} \;
 	@echo "${GREEN}Success${RESET}"
 
 lint:

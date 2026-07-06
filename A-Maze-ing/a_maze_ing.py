@@ -1,25 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
-import os
 import curses
 from configurations.config_checker import config_parsing, validate_config
-from UI.menu import Menu
-
-
-class MazeWindow(object):
-    def __init__(self, stdscreen):
-        self.screen = stdscreen
-        curses.curs_set(0)
-
-        submenu_items = [("ASCII Maze", curses.beep), 
-                         ("Rendered Maze", curses.flash),
-                         ("Special Maze", curses.flash)]
-        submenu = Menu(submenu_items, self.screen)
-
-        main_menu_items = [("Generate Maze", submenu.display)]
-        main_menu = Menu(main_menu_items, self.screen)
-        main_menu.display()
+from MazeGen.maze_generator import MazeGenerator
+from UI.menu import MazeWindow
 
 
 def main() -> None:
@@ -29,13 +14,23 @@ def main() -> None:
     try:
         settings = config_parsing(sys.argv[1])
         validate_config(settings)
+
+        entry = settings['ENTRY'].split(',')
+        exit_p = settings['EXIT'].split(',')
+        maze = MazeGenerator(int(settings['WIDTH']),
+                             int(settings['HEIGHT']),
+                             (int(entry[0]), int(entry[1])),
+                             (int(exit_p[0]), int(exit_p[1])),
+                             perfect=(settings['PERFECT'] == 'True'),
+                             output_file=settings['OUTPUT_FILE']
+                             )
+        # from UI.menu import Menu
+
     except ValueError as e:
-        print(e, file=sys.stderr)
+        print("Error:", e, file=sys.stderr)
     
+    curses.wrapper(MazeWindow, maze)
 
 
 if __name__ == "__main__":
-    try:
-        curses.wrapper(MazeWindow)
-    except Exception as e:
-        print(f"Exiting program: {e}")
+    main()
