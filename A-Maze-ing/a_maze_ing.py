@@ -24,7 +24,6 @@ def main() -> None:
                              perfect=(settings['PERFECT'] == 'True'),
                              output_file=settings['OUTPUT_FILE']
                              )
-        # from UI.menu import Menu
 
     except ValueError as e:
         print("Error:", e, file=sys.stderr)

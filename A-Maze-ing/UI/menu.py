@@ -90,14 +90,23 @@ class MazeWindow(object):
         curses.curs_set(0)
 
         def menu_to_submenu() -> None:
-            self.maze.generate()
+            self.maze.generate_perfect()
             submenu.display()
 
-        submenu_items = [("ASCII Maze", self.maze.print_maze),
-                         ("Animated Maze", self.maze.print_maze),
+        submenu_items = [("ASCII Maze", self.maze.run_visualizer),
+                         ("Animated Maze", self.maze.run_visualizer),
                          ("Change Color", curses.flash)]
         submenu = Menu("A-Maze-ing", submenu_items, self.screen)
 
         main_menu_items = [("Generate Maze", menu_to_submenu)]
         main_menu = Menu("A-Maze-ing", main_menu_items, self.screen)
         main_menu.display()
+
+
+def build_canvas(maze: MazeGenerator) -> list[list[str]]:
+    grid_2D: list[list[str]] = [
+        [" " for _ in range(4 * maze.width + 1)]for _ in range(2 * maze.height + 1)
+    ]
+    print("+"
+          + "+".join("---" for _ in range(maze.width))
+          + "+")
