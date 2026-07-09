@@ -93,7 +93,7 @@ class MazeWindow(object):
             self.maze.generate_perfect()
             submenu.display()
 
-        submenu_items = [("ASCII Maze", self.maze.run_visualizer),
+        submenu_items = [("ASCII Maze", build_canvas(self.maze)),
                          ("Animated Maze", self.maze.run_visualizer),
                          ("Change Color", curses.flash)]
         submenu = Menu("A-Maze-ing", submenu_items, self.screen)
