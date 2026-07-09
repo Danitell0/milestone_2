@@ -2,9 +2,13 @@
 import sys
 import random
 from configurations.check_parsing import MazeConfig, ConfigError
+from maze_generator.generator import generate
 
 def build_maze(settings: MazeConfig, seed: int) -> Maze, str:
-    maze, warnings = generate()
+    maze, warnings = generate(settings)
+
+    for msg in warnings:
+        print(f"Warning: {msg}")
 
 def main() -> None:
     if len(sys.argv) != 2:
