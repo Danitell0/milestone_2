@@ -1,8 +1,8 @@
 
 import random
 from configurations import MazeConfig
-from grid import Maze, ALL_DIRS, MOVE, E, S
-from logo42 import build_logo_cells
+from .grid import Maze, ALL_DIRS, MOVE, E, S
+from .logo42 import build_logo_cells
 
 class GenerationError(Exception):
     pass
@@ -58,7 +58,7 @@ def reduce_dead_ends(maze, visited, rand_seed, tolerance):
     return fixed
 
 def carve_perfect(maze: Maze, start: tuple[int, int],
-                  rand_seed: int) -> set:
+                  rand_gen: random.Random) -> set:
     visited = {start}
     stack = [start]
     while stack:
@@ -69,13 +69,13 @@ def carve_perfect(maze: Maze, start: tuple[int, int],
             nx, ny = x + dx, y + dy
             if not maze.in_bounds(nx, ny):
                 continue
-            if (nx, ny) in maze.blocked or (nx, ny) in visited:
+            if (nx, ny) in maze.blocked_cells or (nx, ny) in visited:
                 continue
             candidates.append((nx, ny, direction))
         if not candidates:
             stack.pop()
             continue
-        nx, ny, direction = rand_seed.choice(candidates)
+        nx, ny, direction = rand_gen.choice(candidates)
         maze.open_wall(x, y, direction)
         visited.add((nx, ny))
         stack.append((nx, ny))
@@ -103,12 +103,12 @@ def generate(settings: MazeConfig):
             "Maze size too small to draw the '42' logo: it has been hidden."
         )
     else:
-        maze.blocked = pattern_cells
+        maze.blocked_cells = pattern_cells
     
     visited = carve_perfect(maze, settings.entry_point, rand_seed)
 
     all_cells = {
-        (x, y) for y in range(settings.height) for x in range(settings.width)} - maze.blocked
+        (x, y) for y in range(settings.height) for x in range(settings.width)} - maze.blocked_cells
     unreached = all_cells - visited
     if unreached:
     # Connect any leftover pockets (can happen if the '42' logo splits

@@ -27,9 +27,8 @@ class Maze:
                 for _ in range(height)]
         self.blocked_cells = set() # 42 pattern
 
-	# Alreay checked in parsing
-    # def in_bounds(self, x, y):
-    #     return 0 <= x < self.width and 0 <= y < self.height
+    def in_bounds(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height
 
     def is_wall(self, x, y, direction):
         return bool(self.cells[y][x] & direction)
@@ -64,7 +63,8 @@ class Maze:
                 if n is not None:
                     result.append(n)
         return result
-
+    
+    # number of open walls. degree == 1 means a dead end
     def degree(self, x, y) -> int:
         return sum(1 for direction in ALL_DIRS if self.is_open(x, y, direction))
 
