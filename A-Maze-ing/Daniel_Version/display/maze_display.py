@@ -12,11 +12,11 @@ DEFAULT_COLORS = {
 }
 
 COLOR_CHOICES = {
-    "1": ("wall", "white", "white"),
-    "2": ("wall", "cyan", "cyan"),
-    "3": ("wall", "blue", "blue"),
-    "4": ("wall", "green", "green"),
-    "5": ("wall", "magenta", "magenta"),
+    "1": ("wall", "white"),
+    "2": ("wall", "cyan"),
+    "3": ("wall", "blue"),
+    "4": ("wall", "green"),
+    "5": ("wall", "magenta"),
 }
 
 COLOR_NAMES = {
