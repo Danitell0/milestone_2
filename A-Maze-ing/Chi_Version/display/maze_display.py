@@ -19,12 +19,6 @@ COLOR_CHOICES = {
 }
 
 
-# def colorize(text: str, color: str, enabled: bool) -> str:
-#     if not enabled or not color:
-#         return text
-#     return f"{color}{text}{RESET}"
-
-
 def render(maze, entry_point, exit_point,
            path_cells=None, colors=None) -> list[list[tuple[str, str]]]:
     """Returns a list of rows; each row is a list of (text, color_name) segments."""
@@ -69,51 +63,6 @@ def render(maze, entry_point, exit_point,
 
     return lines
 
-# def render(maze, entry_point, exit_point,
-#            path_cells=None, colors=None, use_color=True) -> str:
-#     colors = colors or DEFAULT_COLORS
-#     path_cells = path_cells or set()
-#     w, h = maze.width, maze.height
-#     wall_char = colorize("━━", colors.get("wall"), use_color)
-#     vwall_char = colorize("┃", colors.get("wall"), use_color)
-#     lines = []
-
-#     for row in range(h + 1):
-#         corners = [colorize("🮮", colors.get("wall"), use_color)]
-#         for x in range(w):
-#             if row == 0:
-#                 closed = maze.is_wall(x, 0, N)
-#             elif row == h:
-#                 closed = maze.is_wall(x, h - 1, S)
-#             else:
-#                 closed = maze.is_wall(x, row - 1, S)
-#             corners.append(wall_char if closed else "  ")
-#             corners.append(colorize("🮮", colors.get("wall"), use_color))
-#         lines.append("".join(corners))
-
-#         if row < h:
-#             corners = []
-#             # west border of the row
-#             corners.append(vwall_char if maze.is_wall(0, row, 8) else "  ")
-#             for x in range(w):
-#                 cell = (x, row)
-#                 if cell in maze.blocked_cells:
-#                     content = colorize("🮕🮕", colors.get("wall"), use_color)
-#                 elif cell == entry_point:
-#                     content = colorize("EN", colors.get("entry"), use_color)
-#                 elif cell == exit_point:
-#                     content = colorize("EX", colors.get("exit"), use_color)
-#                 elif cell in path_cells:
-#                     content = colorize("..", colors.get("path"), use_color)
-#                 else:
-#                     content = "  "
-#                 corners.append(content)
-#                 closed = maze.is_wall(x, row, 2)  # east
-#                 corners.append(vwall_char if closed else "  ")
-#             lines.append("".join(corners))
-    
-#     return "\n".join(lines)
-
 
 def convert_path_from_letters(entry_point, letters) -> set:
     cells = [entry_point]
@@ -125,4 +74,3 @@ def convert_path_from_letters(entry_point, letters) -> set:
         x, y = x + direction_x, y + direction_y
         cells.append((x, y))
     return set(cells)
-    

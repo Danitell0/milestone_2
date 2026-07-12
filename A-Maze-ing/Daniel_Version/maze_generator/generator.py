@@ -58,7 +58,7 @@ def reduce_dead_ends(maze, visited, rand_seed, tolerance):
     return fixed
 
 def carve_perfect(maze: Maze, start: tuple[int, int],
-                  rand_gen: random.Random) -> set:
+                  rand_seed: int) -> set:
     visited = {start}
     stack = [start]
     while stack:
@@ -75,7 +75,7 @@ def carve_perfect(maze: Maze, start: tuple[int, int],
         if not candidates:
             stack.pop()
             continue
-        nx, ny, direction = rand_gen.choice(candidates)
+        nx, ny, direction = rand_seed.choice(candidates)
         maze.open_wall(x, y, direction)
         visited.add((nx, ny))
         stack.append((nx, ny))

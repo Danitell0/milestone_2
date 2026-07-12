@@ -209,7 +209,6 @@ class MazeWindow(object):
         self.show_maze()
 
     def change_color(self) -> None:
-        # pick = random.choice(list(COLOR_CHOICES))
         choices = list(COLOR_CHOICES.values())
         self.color_ind = (self.color_ind + 1) % len(choices)
         _, code = choices[self.color_ind]
