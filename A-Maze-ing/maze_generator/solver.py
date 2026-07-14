@@ -8,8 +8,18 @@ DIR_LETTER = {1: "N", 2: "E", 4: "S", 8: "W"}
 def maze_solver(maze: Maze,
                 entry_point: tuple[int, int],
                 exit_point: tuple[int, int]) -> list[str] | None:
-    """Return the shortest path from entry to exit as a list of direction
-    letters (N/E/S/W). Returns None if unreachable."""
+    """
+    Find the shortest path from entry_point to exit_point using BFS.
+
+    Args:
+        maze: Maze object with is_open(x, y, direction) and in_bounds(x, y).
+        entry_point: (x, y) starting coordinates.
+        exit_point: (x, y) target coordinates.
+
+    Returns:
+        List of direction letters ("N", "E", "S", "W") for the shortest
+        path from entry to exit, or None if no path exists.
+    """
     if entry_point == exit_point:
         return []
 

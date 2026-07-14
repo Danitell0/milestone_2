@@ -6,6 +6,7 @@ from .logo42 import build_logo_cells
 
 
 class GenerationError(Exception):
+    """Raised when maze generation fails."""
     pass
 
 
@@ -13,7 +14,17 @@ def add_loops(maze: Maze,
               visited: set[tuple[int, int]],
               rand_seed: random.Random,
               target_loops: int) -> int:
-    """Remove extra internal walls to create loops."""
+    """Open extra internal walls to create loops.
+
+    Args:
+        maze: Maze to modify.
+        visited: Reachable cells.
+        rand_seed: Seeded RNG for reproducibility.
+        target_loops: Max number of walls to open.
+
+    Returns:
+        Number of walls actually opened.
+    """
     candidates = []
     for (x, y) in visited:
         for direction in (E, S):  # only check each internal wall once
@@ -40,6 +51,16 @@ def reduce_dead_ends(maze: Maze,
                      visited: set[tuple[int, int]],
                      rand_seed: random.Random,
                      ) -> int:
+    """Give each dead-end cell a second opening where possible.
+
+    Args:
+        maze: Maze to modify.
+        visited: Reachable cells.
+        rand_seed: Seeded RNG for reproducibility.
+
+    Returns:
+        Number of dead ends that received an extra opening.
+    """
     dead_ends = [(x, y) for (x, y) in visited if maze.degree(x, y) == 1]
     rand_seed.shuffle(dead_ends)
     excess = max(0, len(dead_ends))
@@ -70,6 +91,16 @@ def carve_perfect(maze: Maze,
                   start: tuple[int, int],
                   rand_seed: random.Random
                   ) -> set[tuple[int, int]]:
+    """Carve a perfect maze using randomized DFS.
+
+    Args:
+        maze: Maze to carve into.
+        start: Starting cell coordinates.
+        rand_seed: Seeded RNG for reproducibility.
+
+    Returns:
+        Set of all cells reachable from start.
+    """
     visited = {start}
     stack = [start]
     while stack:
@@ -94,6 +125,15 @@ def carve_perfect(maze: Maze,
 
 
 def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
+    """Generate a maze from the given settings.
+
+    Args:
+        settings: Maze configuration (width, height, entry_point,
+            exit_point, seed, perfect).
+
+    Returns:
+        Tuple of the generated Maze and a list of warning messages.
+    """
     assert settings.width is not None
     assert settings.height is not None
     assert settings.entry_point is not None

@@ -19,7 +19,26 @@ ALL_DIRS = (N, E, S, W)
 
 
 class Maze:
+    """A grid-based maze where walls are represented by 4-bit cell values.
+
+    Attributes:
+        width (int): The total number of columns in the maze grid.
+        height (int): The total number of rows in the maze grid.
+        cells (list[list[int]]): A 2D grid storing the 4-bit integer state
+            of each cell's walls.
+        blocked_cells (set[tuple[int, int]]): A set of (x, y) coordinates
+            reserved for custom structural patterns (e.g., a '42' logo).
+    """
     def __init__(self, width: int, height: int) -> None:
+        """Initializes a Maze instance with all walls closed.
+
+        Args:
+            width (int): The width of the maze in cells.
+            height (int): The height of the maze in cells.
+
+        Returns:
+            None.
+        """
         self.width = width
         self.height = height
         # Start fully walled (bit = 15)
@@ -28,15 +47,54 @@ class Maze:
         self.blocked_cells: set[tuple[int, int]] = set()  # 42 pattern
 
     def in_bounds(self, x: int, y: int) -> bool:
+        """Checks if the given coordinates are within the maze grid boundaries.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+
+        Returns:
+            bool: True if the coordinates are in bounds, False otherwise.
+        """
         return 0 <= x < self.width and 0 <= y < self.height
 
     def is_wall(self, x: int, y: int, direction: int) -> bool:
+        """Determines if a wall exists in a specific direction
+        at the given cell.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+            direction (int): The directional bit mask (N, E, S, or W).
+
+        Returns:
+            bool: True if the wall is closed, False if it is open.
+        """
         return bool(self.cells[y][x] & direction)
 
     def is_open(self, x: int, y: int, direction: int) -> bool:
+        """Determines if a passage is open in a specific
+        direction at the given cell.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+            direction (int): The directional bit mask (N, E, S, or W).
+
+        Returns:
+            bool: True if the wall is open, False if it is closed.
+        """
         return not self.is_wall(x, y, direction)
 
     def open_wall(self, x: int, y: int, direction: int) -> None:
+        """Opens a wall at a specific cell and syncs the
+        neighboring cell's wall.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+            direction (int): The directional bit mask to open.
+        """
         # flips all bit in direction and keeps the unchanged
         self.cells[y][x] &= ~direction
         nx, ny = x + MOVE[direction][0], y + MOVE[direction][1]
@@ -44,19 +102,48 @@ class Maze:
             self.cells[ny][nx] &= ~OPPOSITE[direction]
 
     def close_wall(self, x: int, y: int, direction: int) -> None:
+        """Closes a wall at a specific cell and syncs the
+        neighboring cell's wall.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+            direction (int): The directional bit mask to close.
+        """
         self.cells[y][x] |= direction  # flips the only different bit
         nx, ny = x + MOVE[direction][0], y + MOVE[direction][1]
         if self.in_bounds(nx, ny):
             self.cells[ny][nx] |= OPPOSITE[direction]
 
     def neighbor(self, x: int, y: int, direction: int) -> Any | None:
+        """Calculates the adjacent coordinates in a given direction
+        if in bounds.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+            direction (int): The directional bit mask to look toward.
+
+        Returns:
+            tuple[int, int] | None: A tuple of (x, y) coordinates of
+            the neighbor, if it exists within bounds, otherwise None.
+        """
         nx, ny = x + MOVE[direction][0], y + MOVE[direction][1]
         if self.in_bounds(nx, ny):
             return nx, ny
         return None
 
     def open_neighbors(self, x: int, y: int) -> list[Any]:
-        """Cells reachable directly from (x, y) through an open wall."""
+        """Finds all adjacent cells directly accessible via open walls.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+
+        Returns:
+            list[tuple[int, int]]: A list of (x, y) coordinate
+            tuples representing reachable neighboring cells.
+        """
         result = []
         for direction in ALL_DIRS:
             if self.is_open(x, y, direction):
@@ -67,11 +154,27 @@ class Maze:
 
     # number of open walls. degree == 1 means a dead end
     def degree(self, x: int, y: int) -> int:
+        """Calculates the total number of open directions
+        surrounding a single cell.
+
+        Args:
+            x (int): The horizontal column index.
+            y (int): The vertical row index.
+
+        Returns:
+            int: The total count of open paths out of the cell
+            (1 indicates a dead end).
+        """
         return sum(1 for direction in ALL_DIRS
                    if self.is_open(x, y, direction))
 
     def to_lines(self) -> list[str]:
-        """Return the hexadecimal representation, one string per row."""
+        """Converts each row of the maze cells into a hexadecimal string.
+
+        Returns:
+            list[str]: A list of hex string rows representing
+            the complete maze structure.
+        """
         lines = []
         for y in range(self.height):
             lines.append("".join(format(self.cells[y][x],

@@ -22,6 +22,17 @@ def build_logo_cells(width: int,
                      height: int,
                      avoid: Iterable[tuple[int, int]]
                      ) -> set[tuple[int, int]]:
+    """Generates the coordinate cells for a '42' logo centered in a grid.
+
+    Args:
+        width: The total width of the grid.
+        height: The total height of the grid.
+        avoid: An iterable of coordinates that the logo cannot overlap with.
+
+    Returns:
+        A set of (x, y) coordinate tuples representing the '42' logo,
+        or an empty set if the logo doesn't fit or overlaps completely.
+    """
     gap = 1  # space between 4 and 2
     pattern_width = len(DIGIT_4[0]) + gap + len(DIGIT_2[0])
     pattern_height = len(DIGIT_4)
