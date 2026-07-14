@@ -2,7 +2,7 @@
 import random
 from configurations import MazeConfig
 from .grid import Maze, ALL_DIRS, MOVE, E, S
-from .logo42 import build_logo_cells
+from .logo42 import build_logo_cells, LOGOS
 
 
 class GenerationError(Exception):
@@ -151,10 +151,13 @@ def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
     center = (settings.width // 2, settings.height // 2)
     avoid = set(corners) | {center, settings.entry_point, settings.exit_point}
 
-    pattern_cells = build_logo_cells(settings.width, settings.height, avoid)
+    left, right = LOGOS.get(settings.logo_name or "42", LOGOS["42"])
+    pattern_cells = build_logo_cells(settings.width, settings.height, avoid,
+                                     left=left, right=right)
     if not pattern_cells:
         warnings.append(
-            "Maze size too small to draw the '42' logo: it has been hidden."
+            f"Maze size too small to draw the '{settings.logo_name}' "
+            f"logo: it has been hidden."
         )
     else:
         maze.blocked_cells = pattern_cells

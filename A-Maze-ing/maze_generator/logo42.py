@@ -17,10 +17,43 @@ DIGIT_2 = [
     "XXX",
 ]
 
+CHI = [
+    "XXX",
+    "X..",
+    "X..",
+    "X..",
+    "XXX",
+]
+
+DAN = [
+    "XX.",
+    "X.X",
+    "X.X",
+    "X.X",
+    "XX.",
+]
+
+L_HEART = ["XX.", "XXX", "XXX", ".XX", "..X"]
+R_HEART = [".XX", "XXX", "XXX", "XX.", "X.."]
+SMILE_L = ["XXX", "XXX", "...", "X..", ".XX"]
+SMILE_R = ["XXX", "XXX", "...", "..X", "XX."]
+GHOST_L = [".XX", "XXX", "X.X", "XXX", "X.X"]
+GHOST_R = ["XX.", "XXX", "X.X", "XXX", "X.X"]
+
+LOGOS = {
+    "42": (DIGIT_4, DIGIT_2),
+    "CD": (CHI, DAN),
+    "HEART": (L_HEART, R_HEART),
+    "SMILE": (SMILE_L, SMILE_R),
+    "GHOST": (GHOST_L, GHOST_R),
+}
+
 
 def build_logo_cells(width: int,
                      height: int,
-                     avoid: Iterable[tuple[int, int]]
+                     avoid: Iterable[tuple[int, int]],
+                     left: list[str] = DIGIT_4,
+                     right: list[str] = DIGIT_2
                      ) -> set[tuple[int, int]]:
     """Generates the coordinate cells for a '42' logo centered in a grid.
 
@@ -34,8 +67,8 @@ def build_logo_cells(width: int,
         or an empty set if the logo doesn't fit or overlaps completely.
     """
     gap = 1  # space between 4 and 2
-    pattern_width = len(DIGIT_4[0]) + gap + len(DIGIT_2[0])
-    pattern_height = len(DIGIT_4)
+    pattern_width = len(left[0]) + gap + len(right[0])
+    pattern_height = len(left)
 
     margin = 2  # margin 42 incomparing with maze
     if width < pattern_width + margin or height < pattern_height + margin:
@@ -48,7 +81,7 @@ def build_logo_cells(width: int,
 
     cells = set()
     for row in range(pattern_height):
-        combined = DIGIT_4[row] + "." * gap + DIGIT_2[row]
+        combined = left[row] + "." * gap + right[row]
         for col, ch in enumerate(combined):
             if ch == "X":
                 cells.add((ox + col, oy + row))
@@ -61,7 +94,7 @@ def build_logo_cells(width: int,
                 continue
             shifted = set()
             for row in range(pattern_height):
-                combined = DIGIT_4[row] + "." * gap + DIGIT_2[row]
+                combined = left[row] + "." * gap + right[row]
                 for col, ch in enumerate(combined):
                     if ch == "X":
                         shifted.add((ox + col, new_oy + row))

@@ -4,6 +4,7 @@ import curses
 import random
 from curses import panel
 from typing import Callable
+from maze_generator.logo42 import LOGOS
 from .maze_display import (
     COLOR_CHOICES,
     CHAR_THEMES,
@@ -232,6 +233,8 @@ class MazeWindow(object):
         # copy the default colors
         self.colors = dict(DEFAULT_COLORS)
         self.chars = dict(DEFAULT_CHARS)
+        self.logo_name = "42"
+        self.logo_ind = 0
         self.color_ind = 0
         self.char_ind = 0
 
@@ -257,7 +260,8 @@ class MazeWindow(object):
             ("Show Animation", self.animation),
             ("Change Maze Color", self.change_color),
             ("Change Maze Visual", self.change_chars),
-            ("Regenerate", self.regenerate)
+            ("Regenerate", self.regenerate),
+            ("Regenerate w/ new logo", self.change_logo)
         ]
         # the submenu draws the maze as its background via show_maze, so the
         # maze and the menu are visible together
@@ -301,6 +305,7 @@ class MazeWindow(object):
         # changes the seed after the regenerating option in the menu
         if self.seed != settings.seed:
             settings.seed = self.seed
+        settings.logo_name = self.logo_name
         maze, warnings = generate(settings)
         self.maze = maze
 
@@ -458,6 +463,19 @@ class MazeWindow(object):
         # apply it to the "wall" role
         _, code = choices[self.color_ind]
         self.colors["wall"] = code
+
+    def change_logo(self) -> None:
+        """Cycle to the next logo and rebuild the maze around it.
+
+        The logo is stamped into the maze's blocked cells.
+
+        Returns:
+            None.
+        """
+        names = list(LOGOS.keys())
+        self.logo_ind = (self.logo_ind + 1) % len(names)
+        self.logo_name = names[self.logo_ind]
+        self.build_maze(self.settings)
 
     def change_chars(self) -> None:
         """Cycle the maze character theme to the next preset.

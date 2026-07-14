@@ -15,6 +15,7 @@ class MazeConfig:
         self.output_file: str | None = None
         self.perfect: bool | None = None
         self.seed: int | None = None
+        self.logo_name: str = "42"
 
     def validate_parse(self, config_file: str) -> None:
         try:
