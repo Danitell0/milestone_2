@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import curses
-import random
 from curses import panel
 from typing import Callable
+
+from mazegen import MazeGenerator, Maze
+from mazegen.writer import write_maze_file
+from configurations.check_parsing import MazeConfig
 from .maze_display import (
     COLOR_CHOICES,
     CHAR_THEMES,
@@ -11,11 +14,6 @@ from .maze_display import (
     DEFAULT_CHARS,
     convert_path_from_letters,
     render)
-from maze_generator.generator import generate
-from maze_generator.grid import Maze
-from maze_generator.solver import maze_solver
-from maze_generator.writer import write_maze_file
-from configurations import MazeConfig
 
 
 class Menu(object):
@@ -196,7 +194,6 @@ class MazeWindow(object):
         settings: Parsed run configuration
         maze: The current maze, or None until generated
         letters: The solution as N/S/E/W moves, or None until solved
-        seed: Active random seed or from config file
         show_path: Active toggle the path to be drawn over the maze
         colors: Active color-name mapping per maze element
         chars: Active characters mapping per maze element
@@ -224,10 +221,14 @@ class MazeWindow(object):
         self.settings = settings
         self.maze: Maze | None = None
         self.letters: list[str] | None = None
-        # Use the config seed if given, otherwise pick a random one
-        self.seed = (
-            settings.seed if settings.seed is not None
-            else random.randint(0, 999999999))
+        self.generator = MazeGenerator(
+            width=settings.width,
+            height=settings.height,
+            entry_point=settings.entry_point,
+            exit_point=settings.exit_point,
+            perfect=settings.perfect,
+            seed=settings.seed
+        )
         self.show_path = True
         # copy the default colors
         self.colors = dict(DEFAULT_COLORS)
@@ -275,57 +276,43 @@ class MazeWindow(object):
         main_menu.display()
 
     def build_maze(self, settings: MazeConfig) -> None:
-        """Generate a maze, solve it and write it to the output file.
+            """Generate a maze, solve it and write it to the output file.
 
-        Syncs the current seed into the settings, generate the maze,
-        surfaces any generation warnings to the user, solves it,
-        and writes the result. Stores the maze and it's solution so the
-        menu and drawing code can use them.
+            Drives the generator, stores the resulting maze and solution for the
+            drawing code, surfaces any generation warnings, and writes the maze
+            to the configured output file.
 
-        Args:
-            settings: Parsed configuration for this run. May be updated
-                in place if the seed differs.
+            Args:
+                settings: Parsed configuration for this run, used for the
+                    output path.
 
-        Raises:
-            RuntimeError: If the generated maze has no solution.
+            Raises:
+                RuntimeError: If the generated maze has no solution.
 
-        Return:
-            None. Side effects: sets ``self.maze`` and ``self.letters``,
-            writes the output file, and may show warning pop-ups.
-        """
-        # guarantees expected config variables
-        assert settings.entry_point is not None
-        assert settings.exit_point is not None
-        assert settings.output_file is not None
+            Returns:
+                None. Side effects: sets ``self.maze`` and ``self.letters``,
+                writes the output file, and may show warning pop-ups.
+            """
+            assert settings.output_file is not None
 
-        # changes the seed after the regenerating option in the menu
-        if self.seed != settings.seed:
-            settings.seed = self.seed
-        maze, warnings = generate(settings)
-        self.maze = maze
+            # generate + solve, then pull the results off the generator
+            self.generator.generate()
+            self.maze = self.generator.maze
+            self.letters = self.generator.solution
 
-        # show each generation warning as a pop-up
-        for msg in warnings:
-            self.show_warning(f"Warning: {msg}")
+            # show each generation warning as a pop-up
+            for msg in self.generator.warnings:
+                self.show_warning(f"Warning: {msg}")
 
-        # solve the maze with the ordered list of N/S/E/W moves, later used
-        # to draw and animate the path
-        self.letters = maze_solver(maze,
-                                   settings.entry_point, settings.exit_point)
-        # a generated maze should always be solvable
-        if self.letters is None:
-            raise RuntimeError(
-                "Internal Error: generated maze has no possible solution."
-            )
-
-        # persist the maze to the configured file, then confirm the user
-        # with a pop-up
-        write_maze_file(settings.output_file, maze,
-                        settings.entry_point,
-                        settings.exit_point,
-                        self.letters)
-        self.show_warning(f"Maze output was written to "
-                          f"'{settings.output_file}' (seed={settings.seed})")
+            assert self.maze is not None
+            assert self.letters is not None
+            write_maze_file(settings.output_file, self.maze,
+                            self.generator.entry_point,
+                            self.generator.exit_point,
+                            self.letters)
+            self.show_warning(f"Maze output was written to "
+                            f"'{settings.output_file}' "
+                            f"(seed={self.generator.seed})")
 
     def paint(self, win: curses.window,
               rows: list[list[tuple[str, str | None]]],
@@ -438,8 +425,16 @@ class MazeWindow(object):
         Returns:
             None.
         """
-        self.seed = random.randint(0, 999999999)
-        self.build_maze(self.settings)
+        self.generator.regenerate()
+        self.maze = self.generator.maze
+        self.letters = self.generator.solution
+        assert self.settings.output_file is not None
+        assert self.maze is not None
+        assert self.letters is not None
+        write_maze_file(self.settings.output_file, self.maze,
+                        self.generator.entry_point, self.generator.exit_point,
+                        self.letters)
+        self.show_warning(f"Maze regenerated (seed={self.generator.seed})")
 
     def change_color(self) -> None:
         """Cycle the wall color to the next preset.

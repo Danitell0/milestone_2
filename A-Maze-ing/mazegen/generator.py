@@ -1,6 +1,5 @@
 
 import random
-from configurations import MazeConfig
 from .grid import Maze, ALL_DIRS, MOVE, E, S
 from .logo42 import build_logo_cells
 
@@ -124,34 +123,37 @@ def carve_perfect(maze: Maze,
     return visited  # returns every reachable cell
 
 
-def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
+def generate(width: int,
+             height: int,
+             entry_point: tuple[int, int],
+             exit_point: tuple[int, int],
+             perfect: bool = False,
+             seed: int | None = None) -> tuple[Maze, list[str]]:
     """Generate a maze from the given settings.
 
     Args:
-        settings: Maze configuration (width, height, entry_point,
-            exit_point, seed, perfect).
+        width: Number of columns.
+        height: Number of rows.
+        entry_point: (x, y) of the entry cell.
+        exit_point: (x, y) of the exit cell.
+        perfect: If True, leave the maze perfect. If False, add loops and
+            reduce dead ends.
+        seed: Seed for reproducible generation.
 
     Returns:
         Tuple of the generated Maze and a list of warning messages.
     """
-    assert settings.width is not None
-    assert settings.height is not None
-    assert settings.entry_point is not None
-    assert settings.exit_point is not None
-
     warnings: list[str] = []
+    rand_seed = random.Random(seed)
+    maze = Maze(width, height)
 
-    rand_seed = random.Random(settings.seed)
+    corners = [(0, 0), (width - 1, 0),
+               (0, height - 1),
+               (width - 1, height - 1)]
+    center = (width // 2, height // 2)
+    avoid = set(corners) | {center, entry_point, exit_point}
 
-    maze = Maze(settings.width, settings.height)
-
-    corners = [(0, 0), (settings.width - 1, 0),
-               (0, settings.height - 1),
-               (settings.width - 1, settings.height - 1)]
-    center = (settings.width // 2, settings.height // 2)
-    avoid = set(corners) | {center, settings.entry_point, settings.exit_point}
-
-    pattern_cells = build_logo_cells(settings.width, settings.height, avoid)
+    pattern_cells = build_logo_cells(width, height, avoid)
     if not pattern_cells:
         warnings.append(
             "Maze size too small to draw the '42' logo: it has been hidden."
@@ -159,11 +161,11 @@ def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
     else:
         maze.blocked_cells = pattern_cells
 
-    visited = carve_perfect(maze, settings.entry_point, rand_seed)
+    visited = carve_perfect(maze, entry_point, rand_seed)
 
     all_cells = {
-        (x, y) for y in range(settings.height)
-        for x in range(settings.width)} - maze.blocked_cells
+        (x, y) for y in range(height)
+        for x in range(width)} - maze.blocked_cells
     unreached = all_cells - visited
     if unreached:
         # Connect any leftover pockets (can happen if the '42' logo splits
@@ -178,8 +180,8 @@ def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
                     visited.add((x, y))
                     break
 
-    if not settings.perfect:
-        target_loops = max(2, (settings.width * settings.height) // 15)
+    if not perfect:
+        target_loops = max(2, (width * height) // 15)
         add_loops(maze, visited, rand_seed, target_loops)
         reduce_dead_ends(maze, visited, rand_seed)
 

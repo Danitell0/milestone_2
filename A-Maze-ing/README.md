@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by chilam && danmorei*
+*This project has been created as part of the 42 curriculum by chilam, danmorei*
 
 # Description
 
@@ -26,6 +26,93 @@ Hidden "42" logo: the generator carves the digits "42" into the maze as blocked 
 * Pop-up warning/info messages (e.g. when the maze is too small for the "42" logo, or confirming the output file was written)
 
 * Maze export to a plain-text file, including the solution path
+
+# mazegen
+
+A reusable maze generator: builds a maze with a hidden "42" logo carved as
+blocked cells, and solves it with a breadth-first search.
+
+## Install
+
+``` bash
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+
+for easy test run:
+``` bash
+python -c "from mazegen import MazeGenerator; g = MazeGenerator(width=10, height=10, entry_point=(0,0), exit_point=(9,9), seed=1); g.generate(); print(''.join(g.solution))"
+```
+## Basic usage
+
+```python
+from mazegen import MazeGenerator
+
+gen = MazeGenerator(width=20, height=15, entry_point=(0, 0), exit_point=(19, 14))
+gen.generate()
+```
+
+## Custom parameters
+
+```python
+gen = MazeGenerator(
+    width=30,          # number of columns
+    height=20,         # number of rows
+    entry_point=(0, 0),
+    exit_point=(29, 19),
+    perfect=True,      # exactly one path between any two cells
+    seed=42,           # reproducible: same seed -> same maze
+)
+gen.generate()
+```
+
+If `seed` is omitted a random one is chosen and stored on `gen.seed`, so any
+maze can be reproduced. `gen.regenerate()` rebuilds with a fresh random seed;
+`gen.regenerate(seed=7)` rebuilds with a specific one.
+
+## Accessing the generated structure
+
+`gen.maze` is a `Maze`: a grid where each cell is a 4-bit value and a set bit
+means that wall is **closed** (N=1, E=2, S=4, W=8).
+
+```python
+maze = gen.maze
+
+maze.width, maze.height           # dimensions
+maze.is_wall(0, 0, 1)             # is the north wall of cell (0,0) closed?
+maze.is_open(0, 0, 2)             # is the east wall of cell (0,0) open?
+maze.open_neighbors(0, 0)         # [(x, y), ...] cells reachable in one step
+maze.degree(0, 0)                 # number of open walls (1 == dead end)
+maze.blocked_cells                # {(x, y), ...} cells forming the "42" logo
+maze.cells[y][x]                  # raw 4-bit value for a cell
+maze.to_lines()                   # ["bd15...", ...] one hex string per row
+```
+
+Direction constants are importable if you prefer names over numbers:
+
+```python
+from mazegen.grid import N, E, S, W
+maze.is_wall(0, 0, N)
+```
+
+## Accessing the solution
+
+`gen.solution` is the shortest path from entry to exit as direction letters:
+
+```python
+gen.solution          # ["E", "S", "S", "E", ...]
+"".join(gen.solution) # "ESSE..."
+```
+
+## Warnings
+
+`gen.warnings` holds non-fatal messages from the last generation — for
+example, if the maze is too small to fit the "42" logo, it is omitted and a
+warning is recorded.
+
+```python
+for msg in gen.warnings:
+    print(msg)
+```
 
 # Instructions
 
@@ -218,4 +305,3 @@ Our codebase was designed with modularity in mind so components can be easily re
 
 ### AI Usage Disclosure
 * **Tasks Assisted:** AI was utilized to generate test scripts verifying configuration edge cases and to debug screen-flickering anomalies tied to specific terminal resizing triggers within the `curses` refresh loop.
-* **Parts of the Project:** Assisted primarily within `display/window.py` and `configurations/check_parsing.py`.

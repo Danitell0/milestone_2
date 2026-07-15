@@ -36,8 +36,13 @@ def main() -> None:
         return
 
     # sets up the terminal and restores it afterwards
-    curses.wrapper(lambda stdscr: MazeWindow(stdscr, settings))
-
+    try:
+        curses.wrapper(lambda stdscr: MazeWindow(stdscr, settings))
+    except curses.error as e:
+        raise SystemExit(
+            f"Could not start the terminal UI: {e}\n"
+            "Make sure you're running in a proper terminal."
+        )
 
 if __name__ == "__main__":
     main()

@@ -58,8 +58,15 @@ class MazeConfig:
                     if line.startswith('#'):
                         continue
                     if line.strip():
-                        setting = line.split('=', 1)
-                        settings[setting[0]] = setting[1].strip('\n')
+                        try:
+                            setting = line.split('=', 1)
+                            if len(setting) != 2:
+                                raise ConfigError(
+                                    "Invalid syntax use: 'KEY=VALUE'")
+                            settings[setting[0]] = setting[1].strip('\n')
+                        except ValueError:
+                            raise ConfigError(
+                                "Invalid syntax use: 'KEY=VALUE'")
         except FileNotFoundError:
             raise FileNotFoundError(f"'{config_file}' not found.")
         except PermissionError:

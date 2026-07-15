@@ -1,4 +1,4 @@
-from maze_generator.grid import N, S, E, W, MOVE, Maze
+from mazegen.grid import N, S, E, W, MOVE, Maze
 from typing import Iterable
 
 

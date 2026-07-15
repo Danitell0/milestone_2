@@ -1,0 +1,28 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Type checker / linter caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Packaging build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# But the distributable package must be committed at the repo root
+!mazegen-*.whl
+!mazegen-*.tar.gz
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor / OS
+.vscode/
+*.swp
