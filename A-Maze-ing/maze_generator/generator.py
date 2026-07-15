@@ -181,7 +181,6 @@ def generate(settings: MazeConfig) -> tuple[Maze, list[str]]:
     if not settings.perfect:
         target_loops = max(2, (settings.width * settings.height) // 15)
         add_loops(maze, visited, rand_seed, target_loops)
-        # tolerance = max(2, (settings.width * settings.height) // 50)
         reduce_dead_ends(maze, visited, rand_seed)
 
     return maze, warnings

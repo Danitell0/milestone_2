@@ -1,8 +1,16 @@
 # Default configuration for A-Maze-ing
 WIDTH=20
 HEIGHT=20
-ENTRY=1,1
-EXIT=11,11
+
+# ENTRY = int, int
+ENTRY=8,9
+
+# EXIT = int, int
+EXIT=12,11
 OUTPUT_FILE=maze.txt
-PERFECT=True
+
+# PERFECT should be True | False
+PERFECT=False
+
+# Optional
 SEED=42

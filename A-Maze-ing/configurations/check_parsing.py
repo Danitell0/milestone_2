@@ -7,7 +7,25 @@ REQUIRED_KEYS = ['WIDTH', 'HEIGHT', 'ENTRY', 'EXIT',
 
 
 class MazeConfig:
+    """Holds and validates the settings for one maze generation run.
+
+    Created empty, the populated by ``validate_parse`` from a
+    ``KEY=VALUE`` config file. All fields start at None so unparsed
+    state is detectable.
+
+    Attributes:
+        width: Maze width in cells
+        height: Maze height in cells
+        entry_point: (x,y) of the entry cell
+        exit_point: (x,y) of the exit cell
+        output_file: Path the generated maze is written to
+        perfect: True for a perfect maze without loops
+                False for a pac-man like maze
+        seed: seed for reproducible mazes or None to generate a random one
+    """
+
     def __init__(self) -> None:
+        """Create an unpopulated config with all fields unset."""
         self.width: int | None = None
         self.height: int | None = None
         self.entry_point: tuple[int, int] | None = None
@@ -17,6 +35,22 @@ class MazeConfig:
         self.seed: int | None = None
 
     def validate_parse(self, config_file: str) -> None:
+        """Read, parse and validate a config file into the instance.
+
+        Reads ``KEY=VALUE`` lines and converts each value to its proper type.
+
+        Args:
+            config_file: Path to the configuration file to read
+
+        Raises:
+            FileNotFoundError: If the config file does not exist
+            PermissionError: If the config file cannot be read
+            ConfigError: If a required key is missing, a value has the
+                wrong type or format or the entry/exit are invalid
+
+        Returns:
+            None. Populates this instance's attributes
+        """
         try:
             settings = {}
             with open(config_file, 'r') as raw:
@@ -94,6 +128,7 @@ class MazeConfig:
             0 <= self.exit_point[1] < self.height
         ):
             raise ConfigError("Exit position out of bounds.")
+        # checking if entry == exit
         if self.entry_point[
             0] == self.exit_point[
                 0] and self.entry_point[
