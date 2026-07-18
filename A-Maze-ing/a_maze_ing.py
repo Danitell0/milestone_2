@@ -30,7 +30,7 @@ def main() -> None:
     try:
         settings = MazeConfig()
         settings.validate_parse(sys.argv[1])
-    except ConfigError as e:
+    except Exception as e:
         print(f"Configuration error: {e}",
               file=sys.stderr)
         return
